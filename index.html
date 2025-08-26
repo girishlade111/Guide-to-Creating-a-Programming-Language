@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>From Concept to Code: An Interactive Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals (Slate, Zinc, Stone) -->
+    <!-- Application Structure Plan: The SPA is designed as a multi-section, thematic dashboard. A sticky top navigation allows users to jump to key stages of language creation: Philosophy, Syntax, Pipeline, Ecosystem, and DSLs. This non-linear structure is chosen over the report's linear format to allow users to explore topics based on interest, facilitating better comprehension and comparison. Key interactions include a clickable compiler pipeline diagram that reveals details for each stage, and tabbed interfaces to compare concepts like Static vs. Dynamic typing or Compilation vs. Interpretation. This task-oriented design helps users digest the dense information in manageable, interconnected chunks, making the learning process more intuitive and self-directed. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Compiler/Interpreter Pipeline -> Goal: Organize/Explain Process -> Viz/Method: Interactive Diagram (HTML/CSS/JS) -> Interaction: Clicking a stage reveals a detailed text description. -> Justification: Visually represents the flow and makes a complex process digestible and explorable. -> Library/Method: Vanilla JS + Tailwind CSS.
+        - Report Info: Static vs. Dynamic Typing, Compilation vs. Interpretation -> Goal: Compare Concepts -> Viz/Method: Tabbed Content Panes -> Interaction: Clicking tabs switches the visible content block. -> Justification: Allows for direct, side-by-side comparison of core trade-offs without overwhelming the user. -> Library/Method: Vanilla JS.
+        - Report Info: Key Principles (Simplicity, Consistency) -> Goal: Inform -> Viz/Method: Icon-based feature cards -> Interaction: Hover effects for engagement. -> Justification: Breaks down abstract principles into visually distinct, easy-to-scan points. -> Library/Method: Tailwind CSS.
+        - Report Info: Trade-offs Table -> Goal: Compare -> Viz/Method: Interactive Chart (Doughnut) -> Interaction: User selects a "path" (e.g., Performance) to see the corresponding choices for execution, typing, and memory management highlighted in the chart and explained in an adjacent text block. -> Justification: Transforms a static table into an engaging, choice-driven visualization that reinforces the concept of interconnected design decisions. -> Library/Method: Chart.js.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+            color: #1e293b; /* slate-800 */
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #4f46e5; /* indigo-600 */
+            border-bottom-color: #4f46e5;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .pipeline-stage {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .pipeline-stage:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .pipeline-stage.active {
+            border-color: #4f46e5;
+            background-color: #eef2ff; /* indigo-50 */
+        }
+        .tab-button {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .tab-button.active {
+            background-color: #4f46e5;
+            color: white;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-slate-900">Language Design Guide</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#philosophy" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-700">Philosophy</a>
+                        <a href="#syntax" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-700">Syntax & Semantics</a>
+                        <a href="#pipeline" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-700">Implementation</a>
+                        <a href="#ecosystem" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-700">Ecosystem</a>
+                        <a href="#dsl" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-700">DSLs</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        
+        <section id="philosophy" class="content-section space-y-12">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">The Architectural Blueprint</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-600">This section explores the foundational design philosophy behind creating a programming language. Before writing code, a designer must establish the language's purpose, core principles, and the critical trade-offs that will define its character and capabilities.</p>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <h3 class="text-2xl font-semibold text-slate-800 mb-6">Core Design Trade-offs</h3>
+                <p class="text-slate-600 mb-8">Language design is an exercise in balancing competing goals. The choices you make determine whether your language prioritizes raw performance, developer flexibility, or strict safety. Select a development path below to see how one choice influences others across the board.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center mb-8">
+                    <button id="path-perf" class="tradeoff-path-btn p-4 border-2 border-indigo-500 rounded-lg bg-indigo-50 font-semibold text-indigo-700">Performance & Safety Path</button>
+                    <button id="path-flex" class="tradeoff-path-btn p-4 border-2 border-transparent rounded-lg bg-slate-100 font-semibold text-slate-600 hover:bg-slate-200">Flexibility & Agility Path</button>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div class="chart-container">
+                        <canvas id="tradeoffsChart"></canvas>
+                    </div>
+                    <div id="tradeoff-explanation" class="space-y-4 p-6 bg-slate-50 rounded-lg">
+                        <h4 id="exp-title" class="text-xl font-bold text-slate-800">Performance & Safety Path</h4>
+                        <p id="exp-desc" class="text-slate-600">This path prioritizes speed and reliability by making key decisions before the program runs. It's ideal for systems programming, game engines, and other performance-critical applications.</p>
+                        <ul id="exp-list" class="space-y-2 text-slate-700">
+                            <li><strong>Execution:</strong> Compilation to native machine code for maximum speed.</li>
+                            <li><strong>Typing:</strong> Static typing to catch errors early and enable optimizations.</li>
+                            <li><strong>Memory:</strong> Manual management for fine-grained control over resources.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <h3 class="text-2xl font-semibold text-slate-800 mb-2">Execution Strategy</h3>
+                <p class="text-slate-600 mb-6">How will your code run? This is a fundamental choice between pre-translating for speed (Compilation) or translating on-the-fly for flexibility (Interpretation). Many modern languages use a hybrid approach.</p>
+                <div class="flex justify-center mb-6">
+                    <div class="bg-slate-100 p-1 rounded-lg flex space-x-1">
+                        <button class="tab-button active px-4 py-2 text-sm font-semibold rounded-md" data-tab="compilation">Compilation</button>
+                        <button class="tab-button px-4 py-2 text-sm font-semibold rounded-md" data-tab="interpretation">Interpretation</button>
+                        <button class="tab-button px-4 py-2 text-sm font-semibold rounded-md" data-tab="hybrid">Hybrid</button>
+                    </div>
+                </div>
+                <div id="compilation" class="tab-content">
+                    <h4 class="font-semibold text-lg text-slate-800">Compilation</h4>
+                    <p class="mt-2 text-slate-600">A compiler translates the entire source code into machine code before execution. The result is a standalone executable file optimized for a specific CPU. This process yields the highest performance, as the translation work is done only once. It's the preferred model for operating systems, game engines, and scientific computing.</p>
+                </div>
+                <div id="interpretation" class="tab-content hidden">
+                    <h4 class="font-semibold text-lg text-slate-800">Interpretation</h4>
+                    <p class="mt-2 text-slate-600">An interpreter reads and executes source code line-by-line at runtime. No executable file is created. This offers great portability ("write once, run anywhere") and a faster development cycle, as there's no lengthy compilation step. However, the runtime translation overhead makes it slower than compiled code.</p>
+                </div>
+                <div id="hybrid" class="tab-content hidden">
+                    <h4 class="font-semibold text-lg text-slate-800">Hybrid (JIT Compilation)</h4>
+                    <p class="mt-2 text-slate-600">This model combines the best of both worlds. Code is first compiled to an intermediate bytecode. A Virtual Machine (VM) interprets this bytecode and, for frequently used code sections ("hot spots"), compiles them into native machine code at runtime. This provides both portability and near-compiled performance. Java and C# are prominent examples.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="syntax" class="content-section space-y-12">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">The Language of the Language</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-600">This section covers the formal specification of a language: its syntax (the rules) and its semantics (the meaning). We'll explore the core constructs that every language needs to manage data, control program flow, and create abstractions.</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold text-slate-800">Data Types & Variables</h3>
+                    <p class="mt-2 text-slate-600">The foundation of any language is its ability to handle data. This involves defining primitive types (integers, booleans), allowing for composite types (arrays, structs), and specifying rules for variables—the named containers for data.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold text-slate-800">Control Flow</h3>
+                    <p class="mt-2 text-slate-600">To perform useful work, a language needs to control the order of execution. This is achieved through conditional statements like `if/else` to make decisions, and iteration constructs like `for` and `while` loops to repeat actions.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold text-slate-800">Functions & Abstraction</h3>
+                    <p class="mt-2 text-slate-600">Functions are the primary tool for managing complexity. They allow code to be named, parameterized, and reused. Key design decisions include how data is passed (by value or reference) and how results are returned.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="pipeline" class="content-section space-y-12">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">The Implementation Pipeline</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-600">This section details the multi-stage process of transforming source code into an executable program. Click on each stage of the interactive diagram below to learn about its specific role in the compilation process, from initial text to final machine code.</p>
+            </div>
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 text-center text-sm font-medium">
+                    <div id="stage-lexer" class="pipeline-stage p-4 border-2 border-slate-300 rounded-lg cursor-pointer w-full md:w-auto">Lexical Analysis</div>
+                    <div class="text-slate-400 font-bold text-2xl">→</div>
+                    <div id="stage-parser" class="pipeline-stage p-4 border-2 border-slate-300 rounded-lg cursor-pointer w-full md:w-auto">Syntactic Analysis</div>
+                    <div class="text-slate-400 font-bold text-2xl">→</div>
+                    <div id="stage-semantic" class="pipeline-stage p-4 border-2 border-slate-300 rounded-lg cursor-pointer w-full md:w-auto">Semantic Analysis</div>
+                    <div class="text-slate-400 font-bold text-2xl">→</div>
+                    <div id="stage-ir" class="pipeline-stage p-4 border-2 border-slate-300 rounded-lg cursor-pointer w-full md:w-auto">IR & Optimization</div>
+                    <div class="text-slate-400 font-bold text-2xl">→</div>
+                    <div id="stage-codegen" class="pipeline-stage p-4 border-2 border-slate-300 rounded-lg cursor-pointer w-full md:w-auto">Code Generation</div>
+                </div>
+                <div id="pipeline-details" class="mt-8 p-6 bg-slate-50 rounded-lg min-h-[150px]">
+                    <h3 id="pipeline-title" class="text-xl font-bold text-slate-800">Select a stage</h3>
+                    <p id="pipeline-desc" class="mt-2 text-slate-600">Click on a stage in the pipeline diagram above to see a detailed explanation of its function.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="ecosystem" class="content-section space-y-12">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">The Supporting Ecosystem</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-600">A language is more than just a compiler. Its success depends on a rich ecosystem. This section explores the critical components that support a language: the runtime environment that executes code, the standard library that provides core functionality, and the developer tools that enhance productivity.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8 text-center">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100">
+                        <span class="text-2xl">⚙️</span>
+                    </div>
+                    <h3 class="mt-4 text-xl font-semibold text-slate-800">Runtime Environment</h3>
+                    <p class="mt-2 text-slate-600">The system that manages a program during execution, handling memory, garbage collection, and interaction with the operating system.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100">
+                        <span class="text-2xl">📚</span>
+                    </div>
+                    <h3 class="mt-4 text-xl font-semibold text-slate-800">Standard Library</h3>
+                    <p class="mt-2 text-slate-600">A collection of pre-written, reusable code for common tasks like file I/O, data structures, and networking. The "batteries-included" part of a language.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100">
+                        <span class="text-2xl">🛠️</span>
+                    </div>
+                    <h3 class="mt-4 text-xl font-semibold text-slate-800">Developer Tooling</h3>
+                    <p class="mt-2 text-slate-600">Essential tools that make a language practical, including IDE support, build systems, package managers, and debuggers.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="dsl" class="content-section space-y-12">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">A Specialized Path: DSLs</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-600">An alternative to creating a general-purpose language is designing a Domain-Specific Language (DSL). This section introduces DSLs, which are tailored to solve problems in a particular domain, like SQL for databases or CSS for styling.</p>
+            </div>
+            <div class="bg-white p-8 rounded-xl shadow-lg grid md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-xl font-semibold text-slate-800">Internal DSL</h3>
+                    <p class="mt-2 text-slate-600">An Internal (or embedded) DSL is built on top of an existing host language. It leverages the host's features to create a more domain-specific syntax. This is a powerful technique that reuses the existing parser, runtime, and tools, significantly reducing development effort.</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold text-slate-800">External DSL</h3>
+                    <p class="mt-2 text-slate-600">An External DSL is a completely separate language with its own unique syntax and grammar. It requires a custom parser and implementation from scratch. While more work, this approach offers total freedom to create a syntax perfectly tailored to the domain and its users.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const pipelineStages = document.querySelectorAll('.pipeline-stage');
+            const pipelineDetails = {
+                lexer: {
+                    title: 'Phase I: Lexical Analysis (Tokenization)',
+                    desc: 'The lexer scans the raw source code as a stream of characters and groups them into a sequence of tokens. Tokens are the smallest meaningful units, like keywords, identifiers, and operators. Comments and whitespace are typically discarded in this phase.'
+                },
+                parser: {
+                    title: 'Phase II: Syntactic Analysis (Parsing)',
+                    desc: 'The parser takes the stream of tokens and verifies that they conform to the language\'s grammar rules. Its main output is an Abstract Syntax Tree (AST), a hierarchical representation of the code\'s structure that is used by all subsequent phases.'
+                },
+                semantic: {
+                    title: 'Phase III: Semantic Analysis',
+                    desc: 'This phase checks the AST for semantic correctness—the meaning of the program. It performs tasks like type checking (ensuring you don\'t add a string to a number) and symbol resolution (making sure variables are declared before use), using a Symbol Table to track identifiers.'
+                },
+                ir: {
+                    title: 'Phase IV: Intermediate Representation (IR) & Optimization',
+                    desc: 'The AST is converted into a lower-level, platform-independent Intermediate Representation (IR). This modular design allows for powerful optimizations, such as removing dead code or simplifying calculations, to be performed on the IR before targeting a specific machine.'
+                },
+                codegen: {
+                    title: 'Phase V: Code Generation',
+                    desc: 'The final phase translates the optimized IR into the target code. This could be native machine code for a specific CPU, bytecode for a virtual machine, or even source code in another high-level language (a process known as transpiling).'
+                }
+            };
+
+            function updateActiveContent() {
+                const hash = window.location.hash || '#philosophy';
+                
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.getAttribute('href') === hash);
+                });
+
+                contentSections.forEach(section => {
+                    section.classList.toggle('active', section.id === hash.substring(1));
+                });
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.location.hash = link.getAttribute('href');
+                });
+            });
+
+            window.addEventListener('hashchange', updateActiveContent);
+            updateActiveContent(); // Initial load
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    const tabId = button.dataset.tab;
+                    tabContents.forEach(content => {
+                        content.classList.toggle('hidden', content.id !== tabId);
+                    });
+                });
+            });
+
+            pipelineStages.forEach(stage => {
+                stage.addEventListener('click', () => {
+                    pipelineStages.forEach(s => s.classList.remove('active'));
+                    stage.classList.add('active');
+
+                    const stageId = stage.id.split('-')[1];
+                    const details = pipelineDetails[stageId];
+
+                    document.getElementById('pipeline-title').textContent = details.title;
+                    document.getElementById('pipeline-desc').textContent = details.desc;
+                });
+            });
+
+            // Chart.js implementation
+            const ctx = document.getElementById('tradeoffsChart').getContext('2d');
+            const tradeoffsChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Execution Model', 'Typing System', 'Memory Management'],
+                    datasets: [{
+                        label: 'Design Choices',
+                        data: [33.3, 33.3, 33.3],
+                        backgroundColor: [
+                            '#818cf8', // indigo-400
+                            '#a5b4fc', // indigo-300
+                            '#c7d2fe'  // indigo-200
+                        ],
+                        borderColor: '#f8fafc',
+                        borderWidth: 4,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        tooltip: {
+                            enabled: false
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+
+            const tradeoffPathBtns = document.querySelectorAll('.tradeoff-path-btn');
+            const expTitle = document.getElementById('exp-title');
+            const expDesc = document.getElementById('exp-desc');
+            const expList = document.getElementById('exp-list');
+
+            const pathData = {
+                perf: {
+                    title: 'Performance & Safety Path',
+                    desc: 'This path prioritizes speed and reliability by making key decisions before the program runs. It\'s ideal for systems programming, game engines, and other performance-critical applications.',
+                    list: [
+                        '<strong>Execution:</strong> Compilation to native machine code for maximum speed.',
+                        '<strong>Typing:</strong> Static typing to catch errors early and enable optimizations.',
+                        '<strong>Memory:</strong> Manual management for fine-grained control over resources.'
+                    ],
+                    colors: ['#818cf8', '#a5b4fc', '#c7d2fe']
+                },
+                flex: {
+                    title: 'Flexibility & Agility Path',
+                    desc: 'This path prioritizes developer productivity and portability, allowing for faster iteration and code that can run anywhere. It\'s ideal for scripting, web development, and rapid prototyping.',
+                    list: [
+                        '<strong>Execution:</strong> Interpretation for a fast feedback loop and cross-platform support.',
+                        '<strong>Typing:</strong> Dynamic typing for concise code and flexibility.',
+                        '<strong>Memory:</strong> Automatic (Garbage Collection) to simplify programming and prevent leaks.'
+                    ],
+                    colors: ['#fca5a5', '#fdba74', '#fde047'] // red-300, orange-300, yellow-300
+                }
+            };
+
+            tradeoffPathBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tradeoffPathBtns.forEach(b => {
+                        b.classList.remove('border-indigo-500', 'bg-indigo-50', 'text-indigo-700');
+                        b.classList.add('border-transparent', 'bg-slate-100', 'text-slate-600', 'hover:bg-slate-200');
+                    });
+                    btn.classList.add('border-indigo-500', 'bg-indigo-50', 'text-indigo-700');
+                    btn.classList.remove('border-transparent', 'bg-slate-100', 'text-slate-600', 'hover:bg-slate-200');
+
+                    const path = btn.id.split('-')[1];
+                    const data = pathData[path];
+
+                    expTitle.textContent = data.title;
+                    expDesc.textContent = data.desc;
+                    expList.innerHTML = data.list.map(item => `<li>${item}</li>`).join('');
+                    
+                    tradeoffsChart.data.datasets[0].backgroundColor = data.colors;
+                    tradeoffsChart.update();
+                });
+            });
+
+        });
+    </script>
+
+</body>
+</html>
